@@ -10,5 +10,6 @@ int main(int argc, char** argv)
         for(size_t i = 0; i < SA.size(); i++)
                 cout << SA.at(i) << endl;
         
+        
         return 0;
 }

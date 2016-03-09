@@ -20,7 +20,7 @@ SeqIO::~SeqIO()
 
 GenericSeq SeqIO::next()
 {
-	enum state {begin, next};
+	// enum state {begin, next};
 	string line, seq, id, desc;
 
 	while( getline(fd, line, '\n') )
@@ -38,48 +38,9 @@ GenericSeq SeqIO::next()
 
  	for(size_t i = 0; i < seq.size(); i++) {
  		t[i] = seq[i];
- 		//cout << t[i];
  	}
-
-/*
-	cout << seq.length() << endl;
-	cout << seq << endl;
-*/
 
 	GenericSeq gs(id, desc, t);
 	delete t; t = NULL;
 	return gs;
 }
-
-/*
- * Overload >> operator
- */
-/*
-istream& operator>>(istream& ins, GenericSeq& gs)
-{
-	string line, id, desc, seq;
-
-	while (getline(ins, line, ' '))
-	{
-		if(line.at(0) == '>')
-		{
-			id = line.substr(1,line.size()-1);
-			getline(ins, line);
-			desc = line;
-		}
-
-		else seq += line;
-	}
-
-	size_t size = seq.size();
-	unsigned char* t = new unsigned char[size];
-
-	for(size_t i = 0; i < size; i++) {
-		t[i] = seq[0];
-	}
-
-	gs = GenericSeq(id, "", t);
-
-	return ins;
-}
-*/
