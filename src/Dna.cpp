@@ -7,7 +7,7 @@ Dna::Dna(string id, string desc, const string& seq): GenericSeq(id, desc, seq), 
 
 Dna::~Dna()
 {
-    delete[] tab;
+    //delete[] tab;
 }
 
 string Dna::get_type() const
