@@ -10,6 +10,7 @@ BIN = bin
 
 all:
 	@cd $(SRC) && $(MAKE)
+	@cd $(TEST) && $(MAKE)
 
 test: all
 	@cd $(TEST) && $(MAKE)

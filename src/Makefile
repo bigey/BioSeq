@@ -8,9 +8,13 @@ SHELL = /bin/sh
 SRC = Dna.cpp  GenericSeq.cpp  SA.cpp  SeqIO.cpp  SimpleSA.cpp
 OBJECTS = $(SRC:.cpp=.o)
 
-.PHONY: all
-
 all: $(OBJECTS)
+
+Dna.o: Dna.cpp Dna.h GenericSeq.h
+GenericSeq.o: GenericSeq.cpp GenericSeq.h
+SA.o: SA.cpp SA.h
+SeqIO.o: SeqIO.cpp SeqIO.h GenericSeq.h
+SimpleSA.o: SimpleSA.cpp
 
 %.o : %.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@

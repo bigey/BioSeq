@@ -3,7 +3,6 @@
 
 #include <string>
 #include <iostream>
-
 #include "GenericSeq.h"
 
 class Dna: public GenericSeq
@@ -14,7 +13,7 @@ private:
 
 public:
 	Dna();
-	Dna(std::string, std::string, unsigned char*);
+	Dna(std::string, std::string, const std::string&);
 	virtual ~Dna();
 	std::string get_type() const;
 	void print() const;

@@ -3,21 +3,20 @@
 using namespace std;
 
 Dna::Dna(): GenericSeq(), type("dna") {}
-Dna::Dna(string id, string desc, unsigned char* tab): GenericSeq(id, desc, tab), type("dna") {}
+Dna::Dna(string id, string desc, const string& seq): GenericSeq(id, desc, seq), type("dna") {}
 
 Dna::~Dna()
 {
-	tab = 0;
-	delete[] tab;
+    delete[] tab;
 }
 
 string Dna::get_type() const
 {
-	return type;
+    return type;
 }
 
 void Dna::print() const
 {
-	cout << ">" << get_defline() << ", type:" << get_type()	<< endl;
-	cout << get_seq() << endl;
+    cout << ">" << get_defline() << ", type:" << get_type()	<< endl;
+    cout << get_seq() << endl;
 }
