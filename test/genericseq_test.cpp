@@ -6,8 +6,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {   
-    
-    /* initialize timing */
+    /* initialize timing variables */
     clock_t start, end;
     double cpu_time_used;
     start = clock();
@@ -17,24 +16,53 @@ int main(int argc, char** argv)
     
     char base[] = {'A','C','G','T'};
     size_t total = 0;
+    size_t sim = 50;
     
-    for (size_t i = 0; i < 50; i++)
+    for (size_t i = 0; i < sim; i++)
     {    
         string seq("");
-        size_t length = rand() % 10000000 + 1;
+        size_t length = rand() % 100 + 1;
         total += length;
 
         for(size_t j = 0; j < length; j++) {
             char c = base[rand() % 4];
             seq += c;
         }
-      
-        cout << "testing a sequence of length: " << length << endl;
+        
+        /* encoding */
+        cout << "testing encoding (sequence length: " << length << ")";
         GenericSeq gs("", "", seq);
+        cout << " -> test ok\n";
+        
+        /* decoding */
+        cout << "testing decoding...";
         assert( gs.get_seq() == seq );
+        cout << " -> test ok\n";
+        
+        /* copy constructor */
+        cout << "testing copy constructor...";
+        GenericSeq gs3(gs);
+        assert( gs3.get_seq() == seq );
+        cout << " -> test ok\n";
+        
+        /* affectation operator */
+        cout << "testing operator=...";
+        GenericSeq gs2 = gs;
+        assert( gs2.get_seq() == seq );
+        cout << " -> test ok\n";
+        
+        /* operator [] */
+        cout << "testing operator[]()..." << endl;
+        for(size_t k = 1; k <= length; k++) {
+            cout << gs.get_symbol_at(k);
+        }
+        cout << " -> test ok\n";
+        
+        /* insertion operator */
+        cout << "testing operator<<() to stdout..." << endl;
+        cout << gs;
+        cout << " -> test ok\n";
     }
-    
-    
     
     /* compute runing time */
     end = clock();

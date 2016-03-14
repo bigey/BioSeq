@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <fstream>
 
 class GenericSeq {
 
@@ -33,10 +34,11 @@ public:
     std::string get_defline() const;
     virtual void print() const;
     GenericSeq revcom() const;
+    void read(std::ifstream&);
+    void write(std::ostream&) const;
 };
 
-
-std::ostream &operator<<(std::ostream&, const GenericSeq&);
-
+std::ostream& operator<<(std::ostream&, const GenericSeq&);
+std::ifstream& operator>>(std::ifstream&, GenericSeq&);
 
 #endif /* GENERICSEQ_H_ */

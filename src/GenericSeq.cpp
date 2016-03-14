@@ -2,6 +2,7 @@
 
 using namespace std;
 
+
 template <typename T>
 string NumberToString(T num)
 {
@@ -10,6 +11,7 @@ string NumberToString(T num)
     return oOStrStream.str();
 }
 
+
 bool is_valid(char n)
 {
     return (n == 'A') || (n == 'a') ||
@@ -17,6 +19,7 @@ bool is_valid(char n)
            (n == 'G') || (n == 'g') ||
            (n == 'T') || (n == 't');
 }
+
 
 /**
  * Retourne la taille à allouer au tableau de données
@@ -27,6 +30,7 @@ size_t alloc_size(size_t n)
     return n / 4 + (n % 4 != 0);
 }
 
+
 /**
  * Retourne l'indice de l'octet dans le tableau
  */
@@ -35,6 +39,7 @@ size_t get_table_index(size_t n)
     return (n / 4);
 }
 
+
 /**
  * Retourne l'indice du bit dans lequel stocker le character
  */
@@ -42,6 +47,7 @@ size_t get_bit_index(size_t n)
 {
     return (3 -(n % 4)) * 2;
 }
+
 
 /**
  * Encoding method
@@ -62,6 +68,7 @@ unsigned char encoding(unsigned char c)
     return '\00';
 }
 
+
 /**
  * Decoding method
  */
@@ -77,10 +84,12 @@ char decoding(unsigned char c)
     return 'A';
 }
 
+
 /**
  * Default constructor
  */
 GenericSeq::GenericSeq(): id(""), description(""), length(0), tab(NULL) {}
+
 
 /**
  * Complete constructor
@@ -92,7 +101,6 @@ GenericSeq::GenericSeq(string seq_id, string desc, const string& seq): id(seq_id
     tab = new unsigned char[size];
 
     /* Sequence encoding loop */
-//     cout << "encoding...\n";
     for(size_t i = 0; i < length; i++)
     {
         if ( ! is_valid(seq[i]) )
@@ -102,79 +110,101 @@ GenericSeq::GenericSeq(string seq_id, string desc, const string& seq): id(seq_id
         
         if ( i % 4 == 0)
             tab[get_table_index(i)] = 0;
-        
-//         cout << seq[i] << "->" << get_table_index(i) << " " 
-//             << get_bit_index(i) << " " << (int) encoding(seq[i]) << endl;
              
         tab[get_table_index(i)] |= encoding(seq[i]) << get_bit_index(i);
     }
-//     cout << "\n";
 }
+
 
 /**
  * Copy constructor
  */
 GenericSeq::GenericSeq(GenericSeq const& gs): id(gs.id), description(gs.description), length(gs.length), tab(NULL)
 {
-    size_t size = alloc_size(length);
-    tab = new unsigned char[size];
+    if( length )
+    {
+        size_t size = alloc_size(length);
+        tab = new unsigned char[size];
     
-    for(size_t i = 0; i < size; i++)
-        tab[i] = gs.tab[i];
+        for(size_t i = 0; i < size; i++)
+            tab[i] = gs.tab[i];
+    }
 }
 
+
 /**
- * Affectation operator
+ * Affectation operator (=)
  */
 GenericSeq& GenericSeq::operator=(GenericSeq const& gs)
 {
     if(this != &gs)
     {
-        id = gs.id;
-        description = gs.description;
-        length = gs.length;
         size_t size = alloc_size(gs.length);
         
-        delete[] tab;
-        tab = new unsigned char[size];
-
-        for(size_t i = 0; i < size; i++)
-            tab[i] = gs.tab[i];
+        if (length != gs.length)
+        {
+            if ( length )
+            {
+                delete[] tab;
+                tab = NULL;
+            }
+            length = gs.length;
+            
+            if ( length )
+                tab = new unsigned char[size];
+        }
+        
+        if ( length )
+        {
+            for(size_t i = 0; i < size; i++)
+                tab[i] = gs.tab[i];
+        }
+        
+        id = gs.id;
+        description = gs.description;
     }
     return *this;
 }
+
 
 /**
  * Default destructor
  */
 GenericSeq::~GenericSeq()
 {
-    delete[] tab;
+    if( length )
+        delete[] tab;
 }
+
 
 void GenericSeq::set_id(string s)
 {
     id = s;
 }
 
+
 string GenericSeq::get_id() const {
     return id;
 }
+
 
 void GenericSeq::set_description(string s)
 {
     description = s;
 }
 
+
 string GenericSeq::get_description() const
 {
     return description;
 }
 
+
 size_t GenericSeq::get_length() const
 {
     return length;
 }
+
 
 string GenericSeq::get_defline() const
 {
@@ -183,12 +213,11 @@ string GenericSeq::get_defline() const
     return s;
 }
 
+
 string GenericSeq::get_seq() const
 {
     unsigned char octet, tmp;
     string sequence("");
-    
-//     cout << "decoding...\n";
     
     for(size_t i = 0; i < length; i++)
     {
@@ -199,15 +228,8 @@ string GenericSeq::get_seq() const
         tmp = tmp >> 6;                      // right shift the result
         sequence += decoding(tmp);           // decode and concat
         octet = octet << 2;                  // left shift 'octet' and continue
-        
-//         cout << get_table_index(i) << " " 
-//              << get_bit_index(i) << " " 
-//              << (int) tmp << "->" 
-//              << decoding(tmp) << endl;
-        
     }
     
-//     cout << "\n";
     return sequence;
 }
 
@@ -229,6 +251,7 @@ void GenericSeq::print() const
         cout << seq.substr(i, step) << endl;
 }
 
+
 char GenericSeq::get_symbol_at(size_t pos) const
 {
     if (pos > length) {
@@ -240,15 +263,16 @@ char GenericSeq::get_symbol_at(size_t pos) const
     } else {
         size_t byte = get_table_index(pos-1);
         short shift = get_bit_index(pos-1);
-        //return decoding(tab[byte] >> shift & 0b00000011);
-        return decoding(tab[byte] >> shift & '\03');
+        return decoding(tab[byte] >> shift & '\03'); // & 0b00000011
     }
 }
+
 
 char GenericSeq::operator[](size_t i) const
 {
     return get_symbol_at(i);
 }
+
 
 GenericSeq GenericSeq::revcom() const
 {
@@ -272,24 +296,98 @@ GenericSeq GenericSeq::revcom() const
 
         /* Using '~' for complementing 'tab' */
         tmp = ~tab[index] >> right_shift;
-        //tmp &= 0b00000011;
-        tmp &= '\03';
+        tmp &= '\03';   // & 0b00000011
         tmp = tmp << left_shift;
         newSeq.tab[new_index] |= tmp;
     }
     return newSeq;
 }
 
-ostream &operator<<(ostream &os, const GenericSeq &gs)
+
+/**
+ * Read sequence from a file stream
+ */
+// void GenericSeq::read(ifstream &is)
+// {
+//     if ( ! is.is_open() ) {
+//         cerr << "unable to read from stream!" << endl;
+//         return;
+//     }
+//     
+//     if (length) {
+//         length = 0;
+//         delete[] tab;
+//         tab = NULL;
+//     }
+//     
+//     streampos p = is.tellg();
+//     char c;
+//     
+//     while ( ! is.eof() && is.get(c) && is_valid(c) ) {
+//         length += !isspace(c);
+//     }
+//     
+//     cerr << " reading " << length << " characters...\n";
+//     
+//     if (length)
+//     {
+//         tab = new unsigned char[alloc_size(length)];
+//         is.seekg(p);
+//         // size_t  i = 0;
+//         
+//         while ( !is.eof() && is_valid(c = is.get()) ) {
+//             /* TODO
+//              * encoder le char et le stocker dans tab
+//              */
+//              
+//         }
+//     }
+//     
+//     return;
+// }
+
+
+/**
+ * Write sequence to STDOUT
+ */
+void GenericSeq::write(ostream &os) const
 {
-    for (size_t i = 1; i <= gs.get_length() ; i++) {
-        os << gs.get_symbol_at(i);
+    for (size_t i = 1; i <= length; i++) {
+        os << get_symbol_at(i);
     }
+}
+
+
+/**
+ * 
+ * Non member methods
+ * 
+ */
+
+
+/**
+ * Extraction operator (>>) extracts as many characters as possible from the stream
+ */
+ostream& operator<<(ostream &os, const GenericSeq& gs)
+{
+    gs.write(os);
     return os;
 }
 
-/*
- * TODO
- * void Seq::set_symbol_at(size_t position, char symbol);
- * Seq Seq::get_sub_seq(size_t start, size_t end) const;
+
+/**
+ * 
  */
+// ifstream& operator>>(ifstream& ifs, GenericSeq& gs)
+// {
+//     gs.read(ifs);
+//     return ifs;
+// }
+
+
+/**
+ * TODO:
+ *   void Seq::set_symbol_at(size_t position, char symbol);
+ *   Seq Seq::get_sub_seq(size_t start, size_t end) const;
+ */
+
