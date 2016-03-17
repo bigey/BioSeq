@@ -146,7 +146,7 @@ GenericSeq SeqIO::next()
             
         } else {
             /* Malformed file */
-            
+            // TODO: à faire...
         }
     }
     
@@ -174,4 +174,9 @@ GenericSeq SeqIO::next()
     }
     
     return GenericSeq("", "", "");
+}
+
+bool SeqIO::is_eof() const
+{
+    return fd.eof();
 }

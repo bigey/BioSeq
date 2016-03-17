@@ -3,6 +3,9 @@
 using namespace std;
 
 
+/**
+ * Number to string convertion
+ */
 template <typename T>
 string NumberToString(T num)
 {
@@ -12,6 +15,9 @@ string NumberToString(T num)
 }
 
 
+/**
+ * Checking input character validity
+ */
 bool is_valid(char n)
 {
     return (n == 'A') || (n == 'a') ||
@@ -23,7 +29,6 @@ bool is_valid(char n)
 
 /**
  * Retourne la taille à allouer au tableau de données
- *
  */
 size_t alloc_size(size_t n)
 {
@@ -45,7 +50,7 @@ size_t get_table_index(size_t n)
  */
 size_t get_bit_index(size_t n)
 {
-    return (3 -(n % 4)) * 2;
+    return (3 - (n % 4)) * 2;
 }
 
 
@@ -92,7 +97,7 @@ GenericSeq::GenericSeq(): id(""), description(""), length(0), tab(NULL) {}
 
 
 /**
- * Complete constructor
+ * Constructor using string sequence as input
  */
 GenericSeq::GenericSeq(string seq_id, string desc, const string& seq): id(seq_id), description(desc), length(seq.size()), tab(NULL)
 {
@@ -114,6 +119,15 @@ GenericSeq::GenericSeq(string seq_id, string desc, const string& seq): id(seq_id
         tab[get_table_index(i)] |= encoding(seq[i]) << get_bit_index(i);
     }
 }
+
+
+/**
+ * Constructor using an encoded table as input
+ */
+// GenericSeq::GenericSeq(string seq_id, string desc, const unsigned char* t): id(seq_id), description(desc), length(0), tab(NULL)
+// {
+//     
+// }
 
 
 /**
@@ -168,7 +182,7 @@ GenericSeq& GenericSeq::operator=(GenericSeq const& gs)
 
 
 /**
- * Default destructor
+ * Destructor
  */
 GenericSeq::~GenericSeq()
 {
@@ -261,8 +275,8 @@ char GenericSeq::get_symbol_at(size_t pos) const
         return 'N';
 
     } else {
-        size_t byte = get_table_index(pos-1);
-        short shift = get_bit_index(pos-1);
+        size_t byte = get_table_index(pos);
+        short int shift = get_bit_index(pos);
         return decoding(tab[byte] >> shift & '\03'); // & 0b00000011
     }
 }
@@ -271,6 +285,18 @@ char GenericSeq::get_symbol_at(size_t pos) const
 char GenericSeq::operator[](size_t i) const
 {
     return get_symbol_at(i);
+}
+
+
+string GenericSeq::get_sub_seq(size_t start, size_t end) const
+{
+    string seq("");
+    
+    for (size_t i = 1; i <= length; i++)
+    {
+        seq += get_symbol_at(i);
+    }
+    return seq;
 }
 
 
@@ -352,7 +378,7 @@ GenericSeq GenericSeq::revcom() const
  */
 void GenericSeq::write(ostream &os) const
 {
-    for (size_t i = 1; i <= length; i++) {
+    for (size_t i = 0; i < length; i++) {
         os << get_symbol_at(i);
     }
 }

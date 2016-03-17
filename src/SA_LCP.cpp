@@ -12,6 +12,7 @@ struct SAcomp {
     bool operator()(size_t a, size_t b) const
     {
         size_t length = seq.size();
+        
         while( (a < length) && (b < length) && (seq[a] == seq[b]) ) {
             a++; b++;
         }

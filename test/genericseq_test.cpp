@@ -53,8 +53,9 @@ int main(int argc, char** argv)
         
         /* operator [] */
         cout << "testing operator[]()..." << endl;
-        for(size_t k = 1; k <= length; k++) {
-            cout << gs.get_symbol_at(k);
+        for(size_t k = 0; k < length; k++) {
+            //cout << gs.get_symbol_at(k);
+            assert( gs.get_symbol_at(k) == seq[k] );
         }
         cout << " -> test ok\n";
         

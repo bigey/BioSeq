@@ -18,7 +18,7 @@ int main(int argc, char** argv)
     
     char base[] = {'A','C','G','T'};
     size_t simulation = 10;             // number of simulations
-    size_t seqLength = 100000;
+    size_t seqLength = 10000;
     size_t total = 0;
         
     /* Generating suffix array on random sequences */

@@ -29,13 +29,14 @@ private:
     regmatch_t matches[MAX_MATCHES];
     
     /* Private function returning a GenericSeq object */
-    GenericSeq gs(std::string, std::string, std::string&);
+    //GenericSeq gs(std::string, std::string, std::string&);
     
 public:
     SeqIO(std::string, const char);
     virtual ~SeqIO();
     GenericSeq& operator=(GenericSeq &gs);
     GenericSeq next();
+    bool is_eof() const;
 };
 
 

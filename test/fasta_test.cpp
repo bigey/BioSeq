@@ -22,6 +22,7 @@ int main(int argc, char** argv)
     
     char base[] = {'A','C','G','T'};
     size_t simulation = 50;           // number of simulations
+    size_t maxLength = 1000;
     char fasta[] = "test.fasta";
     vector<string> Sequences;
     size_t total = 0;
@@ -40,8 +41,10 @@ int main(int argc, char** argv)
     cerr << "Writing sequences to file...\n";
     for (size_t i = 0; i < simulation; i++)
     {    
+        /* Random sequence generation */
+        cerr << "random sequence generation...\n";
         string seq("");
-        size_t length = rand() % 10000000 + 1;
+        size_t length = rand() % maxLength + maxLength;
         total += length;
 
         for(size_t j = 0; j < length; j++) {
@@ -73,12 +76,15 @@ int main(int argc, char** argv)
     
     for (size_t i = 0; i < simulation; i++)
     {
-        cerr << "reading sequence " << i << " of length: " 
-             << Sequences[i].size();
+        cerr << "   reading sequence " << i << " of length: " 
+             << Sequences[i].size() << "...\n";
              
+        cerr << "   creating GenericSeq object...\n";
         GenericSeq gs = seqio.next();
+        
+        cerr << "   comparing original and stored sequences...\n";
         assert( gs.get_seq() == Sequences[i] );
-        cerr << " test ok\n";
+        cerr << "   -> test ok\n\n";
     }
     
     /* compute runing time */
