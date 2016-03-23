@@ -6,20 +6,22 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    cerr << "Begining test...\n";
+    /* Simulation parameters */
+    char base[] = {'A','C','G','T'};
+    size_t simulation = 100;            // number of simulations
+    size_t seqLength = 1000;      // average sequence length
+    size_t kmer_size = 21;            // kmer size
     
-    /* initialize timing */
+    cout << "Begining test...\n";
+    size_t total = 0;
+    
+    /* Initialize timing */
     clock_t start, start_step, end;
     double cpu_time_used;
     start = clock();
     
-    /* initialize random seed */
+    /* Initialize random seed */
     srand( time(NULL) );
-    
-    char base[] = {'A','C','G','T'};
-    size_t simulation = 20;             // number of simulations
-    size_t seqLength = 100000;
-    size_t total = 0;
         
     /* Generating suffix array on random sequences */
     for (size_t i = 0; i < simulation; i++)
@@ -28,53 +30,66 @@ int main(int argc, char** argv)
         size_t length = rand() % seqLength/2 + seqLength;
         total += length;
         
-        cerr << "[Test: " << i+1 << "] \n";
+        cout << "[Test: " << i+1 << "] \n";
         
         /* Generating random sequences */
-        cerr << "Generating random sequence of length " << length << "...\n";
-        for(size_t j = 0; j < length; j++) {
+        cout << "Generating random sequence of length " << length << "...\n";
+        for(size_t j = 0; j < length; j++) 
+        {
             seq += base[rand() % 4];
         }
         
         /* GenericSeq object construction */
-        cerr << "GenricSeq object encoding...";
+        cout << "GenricSeq object encoding...";
         GenericSeq gs("id"+0,"test description", seq);
-        cerr << " -> ok\n";
-        
-        //cout << gs << endl;
+        cout << " -> ok\n";
         
         /* Computing suffix array and LCP array */
-        cerr << "Computing suffix array and LCP array... ";
+        cout << "Computing suffix array and LCP array...\n";
         start_step = clock();
         SuffixArray sa(gs);
         end = clock();
+        
         cpu_time_used = ((double) (end - start_step)) / CLOCKS_PER_SEC;
-        cerr << "done in " << cpu_time_used << " sec\n";
+        cout << "   done in " << cpu_time_used << " sec";
+        cout << " -> ok\n";
+        
         
         /* Testing */
-        cerr << "Validating suffix array...";
+        cout << "Validating suffix array...\n";
         
+        //cout << "\n";
         //cout << setw(5) << "i" << setw(7) << "sa[i]" << " " 
         //     << setw(7) << "lcp[i]" << " suffix\n" << endl;
         
         for(size_t k = 0; k < sa.get_length(); k++)
         {
             //cout << setw(5) << k << setw(7) << sa[k] << " " 
-            //     << setw(7) << sa.get_lcp(k) << " ";
+            //    << setw(7);
+                
+            if (k == 0)
+            {
+                //cout << "undef" << " ";
+            } 
+            else
+            {
+                //cout << sa.get_lcp(k) << " ";
+            }
                  
             //cout << seq.substr(sa[k], string::npos);
             
             /* testing if string at SA[i] > SA[i-1] */
-            if( k > 0 )
+            if( k > 0 ) {
                 //cout << " > " << seq.substr(sa[k-1], string::npos) << " ";
                 assert(seq.substr(sa[k], string::npos) >= seq.substr(sa[k-1], string::npos));
+            }
             
             //cout << " -> ok\n";
         }
-        cout << " -> ok\n";
+        cout << "Suffix array -> ok\n";
         
         /* Validation of LCP array construction */
-        cerr << "Validating LPC array...";
+        cout << "Validating LPC array...";
         
         //cout << setw(5) << 0 << setw(5) << 0 << " " << "undefined" << endl;
 
@@ -90,16 +105,45 @@ int main(int argc, char** argv)
             assert( si.substr(0,sa.get_lcp(p)) == sj.substr(0,sa.get_lcp(p)) );
             assert( si.substr(0,sa.get_lcp(p)+1) != sj.substr(0,sa.get_lcp(p)+1) );
         }
-        
         cout << " -> ok\n";
-        cerr << "[Test: " << i+1 << "] passed\n\n";
+        
+        
+        /* Validation of find_match() */
+        cout << "Validating find_match()..." << endl;
+
+        size_t begin = rand() % (length - kmer_size +1);
+        string query = seq.substr(begin, kmer_size);
+        
+        //cout << seq << endl;
+        //cout << query << endl;
+        cout << "   query take at position " << begin << endl;
+        
+        start_step = clock();
+        size_t match_found = sa.find_match(query);
+        cpu_time_used = ((double) (clock() - start_step)) / CLOCKS_PER_SEC;
+        
+        if (match_found == 0xFFFFFFFFFFFFFFFF)
+        {
+            cout << "   query NOT found!" << endl;
+        }
+        else
+        {
+            cout << "   query found at position " 
+                 << match_found << endl;
+            
+        }
+        
+        assert( begin == match_found );
+        cout << "   done in " << cpu_time_used << " sec";
+        cout << " -> ok\n";
+        cout << "[Test: " << i+1 << "] passed\n\n";
     }
     
     /* compute runing time */
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-    cerr << "All tests passed!\n";
-    cerr << total << " nucleotides proceed in " << cpu_time_used << " sec\n";
+    cout << "All tests passed!\n";
+    cout << total << " nucleotides proceed in " << cpu_time_used << " sec\n";
     
     return 0;
 }

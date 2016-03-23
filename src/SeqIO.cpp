@@ -2,7 +2,7 @@
 
 using namespace std;
 
-SeqIO::SeqIO(string f, const char d): file(f), direction(d), fd(0), counter(0), countLine(0), numOfSequence(0), state(start)
+SeqIO::SeqIO(const string &f, const char d): file(f), direction(d), fd(0), counter(0), countLine(0), numOfSequence(0), state(start)
 {
     if( direction == 'r' ) {
         
@@ -30,7 +30,7 @@ SeqIO::~SeqIO()
 }
 
 GenericSeq SeqIO::next()
-{    
+{
     line = seq = qual = "";
     
     /* Parsing input file */

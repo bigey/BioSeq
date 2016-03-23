@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <vector>
 #include <regex.h>
 #include "GenericSeq.h"
 
@@ -14,12 +15,11 @@ class SeqIO {
 
 private:
     const std::string file;
-    std::string line, seq, qual, id, desc;
     const char direction;
     std::fstream fd;
-    char c;
-    size_t counter, countLine, numOfSequence;
-    size_t pos;
+    std::vector<std::streampos> begin;
+    std::vector<std::string> identifier;
+    size_t pointer;
     
     /* States of the automata */
     enum state_t { start, fastaSeq, fastqSeq, fastqQual, stop } state;
@@ -34,8 +34,9 @@ private:
 public:
     SeqIO(const std::string &, const char);
     virtual ~SeqIO();
-    GenericSeq& operator=(GenericSeq &gs);
-    GenericSeq next();
+    //GenericSeq& operator=(GenericSeq &gs);
+    void index();
+    bool read(GenericSeq&);
     bool is_eof() const;
 };
 

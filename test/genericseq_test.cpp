@@ -16,12 +16,15 @@ int main(int argc, char** argv)
     
     char base[] = {'A','C','G','T'};
     size_t total = 0;
+    size_t mean_length = 100;
     size_t sim = 50;
     
     for (size_t i = 0; i < sim; i++)
     {    
+        cout << "[Test:" << i+1 << "]\n";
+        
         string seq("");
-        size_t length = rand() % 100 + 1;
+        size_t length = rand() % mean_length + 1;
         total += length;
 
         for(size_t j = 0; j < length; j++) {
@@ -52,7 +55,7 @@ int main(int argc, char** argv)
         cout << " -> test ok\n";
         
         /* operator [] */
-        cout << "testing operator[]()..." << endl;
+        cout << "testing operator[]()...";
         for(size_t k = 0; k < length; k++) {
             //cout << gs.get_symbol_at(k);
             assert( gs.get_symbol_at(k) == seq[k] );
@@ -63,6 +66,31 @@ int main(int argc, char** argv)
         cout << "testing operator<<() to stdout..." << endl;
         cout << gs;
         cout << " -> test ok\n";
+        
+        /* one base modification */
+        cout << "testing set_symbol_at()...";
+        //cout << "  changing random base";
+        for (size_t l = 0; l < 100; l++)
+        {
+            //cout << "\n";
+            
+            size_t p = rand() % gs.get_length();
+            char c = base[rand() % 4];
+            
+            //cout << gs << " " << p << " " 
+            //     << seq[p] << ">" 
+            //     << c << endl;
+                 
+            gs.set_symbol_at(p, c);
+            seq[p] = c;
+            
+            //cout << seq << endl;
+            //cout <<  gs << endl;
+            
+            assert( gs.get_seq() == seq );
+        }
+        cout << " -> tests ok\n";
+        cout << "[Test:" << i+1 << "] all tests ok\n\n";
     }
     
     /* compute runing time */

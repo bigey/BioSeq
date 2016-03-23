@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <assert.h>
 
 class GenericSeq {
 
@@ -16,17 +17,17 @@ private:
 
 public:
     GenericSeq();
-    GenericSeq(std::string, std::string, const std::string&);
-    GenericSeq(std::string, std::string, const unsigned char*);
+    GenericSeq(const std::string&, const std::string&, const std::string&);
+    GenericSeq(size_t);
     GenericSeq(GenericSeq const&);
     GenericSeq& operator=(GenericSeq const&);
     virtual ~GenericSeq();
 
     char operator[](size_t) const;
-    void set_id(std::string);
-    std::string get_id() const;
-    void set_description(std::string);
-    std::string get_description() const;
+    void set_id(const std::string &);
+    const std::string& get_id() const;
+    void set_description(const std::string &);
+    const std::string& get_description() const;
     size_t get_length() const;
     std::string get_seq() const;
     char get_symbol_at(size_t) const;
