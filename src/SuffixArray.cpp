@@ -7,24 +7,20 @@ using namespace std;
  * Sequence comparison
  */
 struct SaComp {
+    
     GenericSeq gs;
     SaComp(const GenericSeq& s): gs(s) {}
     
     bool operator() (size_t a, size_t b) const
-    {
+    {   
         size_t length = gs.get_length();
-        //size_t c;
         
-        while ( (a < length) && (b < length) && (gs[a] == gs[b]) )
-        //while ( (c < length) && (gs[a] == gs[b]) )
+        while ((a < length) && (b < length) && (gs[a] == gs[b]))
         {
             a++; b++;
-            //c = a > b ? a : b;
-            //cerr << a << " " << b << endl;
         }
         
-        //cerr << "gs[" << a << "]:" << gs[a] << " == gs[" << b << "]:" << gs[b] << endl;
-        return (a >= length) || ((b < length) && (gs[a] < gs[b]));
+        return (a == length) || ((b < length) && (gs[a] < gs[b]));
     }
 };
 
@@ -48,11 +44,11 @@ SuffixArray::SuffixArray(const GenericSeq& gseq): length(gseq.get_length()), gs(
     }
     
     // SA construction
-    cerr << "   builing SA...\n";
+    cerr << "   Builing SA...\n";
     buildSa();
     
     // LCP construction
-    cerr << "   building LCP...\n";
+    cerr << "   Building LCP...\n";
     buildLcp();
 }
 
@@ -126,12 +122,18 @@ SuffixArray::~SuffixArray()
 }
 
 
+/**
+ * Return the length of the suffix array table
+ */
 size_t SuffixArray::get_length() const
 {
     return length;
 }
 
 
+/**
+ * 
+ */
 size_t SuffixArray::operator[] (size_t i) const
 {
     if (i < length)
@@ -157,43 +159,51 @@ void SuffixArray::buildSa()
     assert(length != 0);
     
     clock_t start = clock();
-    double cpu_time_used;
+    double cpu_time;
     
-    //cerr << "      filling SA...\n";
     for(size_t i = 0; i < length; i++)
         sa[i] = i;
 
-    //cerr << "      sorting...\n";
+    cerr << "      sorting...\n";
     sort(sa, sa + length, SaComp(gs));
     
-    cpu_time_used = ((double) (clock() - start)) / CLOCKS_PER_SEC;
-    cout << "   SA builded in " << cpu_time_used << " sec\n";
+    
+    cpu_time = ((double) (clock() - start)) / CLOCKS_PER_SEC;
+    cout << "   SA builded in " << cpu_time << " sec\n";
 }
 
 
 /**
- * Building LCP array: lcp[]
+ * Compute the length of the lcp between suffixes 
+ *  at posisition i and j in the SA
+ */
+size_t SuffixArray::compute_lcp(size_t i, size_t j) const
+{
+    size_t k = 0;
+    
+    while ( sa[i] + k < length 
+                && sa[j] + k < length 
+                && gs[sa[i] + k] == gs[sa[j] + k] )
+    {
+        k++;
+    }
+    
+    return k;
+}
+
+
+/**
+ * Building the LCP array: lcp[]
  */
 void SuffixArray::buildLcp()
 {
     clock_t start = clock();
     double cpu_time_used;
     lcp[0] = 0;
-    size_t curr_suff_lg, prev_suff_lg;
     
-    for (size_t k = 1; k < length; k++)
+    for (size_t i = 1; i < length; i++)
     {
-        curr_suff_lg = length - sa[k];
-        prev_suff_lg = length - sa[k-1];
-        
-        size_t i = 0;
-        
-        while ( (i < curr_suff_lg) && (i < prev_suff_lg) && (gs[sa[k-1]+i] == gs[sa[k]+i]) )
-        {
-            i++; 
-        }
-        
-        lcp[k] = i;
+        lcp[i] = compute_lcp(i-1, i);
     }
     
     cpu_time_used = ((double) (clock() - start)) / CLOCKS_PER_SEC;
@@ -202,7 +212,7 @@ void SuffixArray::buildLcp()
 
 
 /**
- * Return the value stored in the LCP array at postion 's_num'
+ * Return the longest common prefix between postions i and i-1
  */
 size_t SuffixArray::get_lcp(size_t s_num) const
 {
@@ -220,43 +230,11 @@ size_t SuffixArray::get_lcp(size_t s_num) const
 
 
 /**
- * Comparison between string 'str' and the suffix 'sa[s_num]' from position 'p'
- */
-// bool SuffixArray::compare(const string& str, size_t s_num, size_t p) const
-// {
-//     size_t k = 0;
-//     
-//     while ( p+k < str.size() 
-//         && sa[s_num] + p+k < length 
-//         && gs[sa[s_num] + p+k] == str[p+k] )
-//     {
-//         k++;
-//     }
-//     
-//     
-//     /* 
-//      * Return true if:
-//      * 
-//      *   (1) we reach the end of the indexed sequence,
-//      * 
-//      *   OR
-//      * 
-//      *   (2) the symbol at position 'p+k 'of 'str' is greater than 
-//      *          the symbol in the suffix
-//      */ 
-//     return (p+k < str.size() && sa[s_num] + p+k >= length) ||
-//            (p+k < str.size() && sa[s_num] + p+k < length &&
-//               str[p+k] > gs[sa[s_num] + p+k]);
-// }
-
-/**
- * 
- * Comparison between string 'str' and the suffix 'sa[s_num]'
+ * Comparison between string 'str' and the suffix at position 's_num'
  * 
  *  if str > suffix: return  1
  *  if str < suffix: return -1
  *  else: return 0
- * 
  */
 short int SuffixArray::strCmp(const string& str, size_t s_num) const
 {
@@ -267,17 +245,15 @@ short int SuffixArray::strCmp(const string& str, size_t s_num) const
         k++;
     }
     
-    if (  (k < str.size() && sa[s_num]+k >= length) ||
-          (k < str.size() && sa[s_num]+k < length &&
-              str[k] > gs[sa[s_num]+k])
-       )
+    if ( (k < str.size() && sa[s_num]+k >= length) ||
+         (k < str.size() && sa[s_num]+k < length &&
+          str[k] > gs[sa[s_num]+k]) )
     {
         return 1;
     }
-    else if (   k < str.size() && 
-                sa[s_num]+k < length &&
-                str[k] < gs[sa[s_num]+k]
-            )
+    else if ( k < str.size() && 
+              sa[s_num]+k < length &&
+              str[k] < gs[sa[s_num]+k] )
     {
         return -1;
     }
@@ -287,77 +263,9 @@ short int SuffixArray::strCmp(const string& str, size_t s_num) const
 
 
 /**
- * Compute the length of the longest common prefix between a string 'str'
- *   and the suffix 'sa[s_num]'
+ * Perform a binary search in the suffix array:
+ *   return the index of the suffix where str was found
  */
-// size_t SuffixArray::compute_lcp(const string& str, size_t s_num) const
-// {
-//     size_t k = 0;
-//     
-//     while ( k < str.size() 
-//         && sa[s_num] + k < length 
-//         && gs[sa[s_num] + k] == str[k] )
-//     {
-//         k++;
-//     }
-//     
-//     return k;
-// }
-
-
-/**
- * Binary search of the string 'str' in the prefix of the suffix array
- */
-// size_t SuffixArray::binary_search(const string& str, size_t low, size_t high) const
-// {
-//     if (high == low)
-//     {
-//         if ( compute_lcp(str, high) == str.size() )
-//         {
-//             return high;
-//         }
-//         else
-//         {
-//             return 0xFFFFFFFFFFFFFFFF;
-//         }
-//     }
-//     
-//     size_t middle = low + (high - low) / 2;
-//     size_t k = compute_lcp(str, middle);
-//        
-//     if ( k == str.size() )  // str a été retrouvé
-//     {   
-//         return middle;
-//     }
-//     else if ( k == 0 )      // aucun char commun
-//     {
-//         if ( str[0] > gs[sa[middle]] )
-//         {
-//             //cout << "k=" << k <<"|"<< low <<" "<<middle <<" "<< high << " l=m\n";
-//             low = middle+1;
-//         }
-//         else
-//         {
-//             //cout << low <<" "<<middle <<" "<< high << " h=m\n";
-//             high = middle;
-//         }
-//     }
-//     else if ( compare(str, middle, k) )       // str > sa[middle]
-//     {   
-//         //cout << "k=" << k <<"|"<<low <<" "<<middle <<" "<< high << " l=m\n";
-//         low = middle+1;
-//     }
-//     else                                 // str < sa[middle+1]
-//     {
-//         //cout << "k=" << k <<"|"<<low <<" "<<middle <<" "<< high << " h=m\n";
-//         high = middle;
-//     }
-//     
-//     //cout << "low:" << low << " high:" << high << endl;
-//     return binary_search(str, low, high);
-// }
-
-
 size_t SuffixArray::find_match(const string& str) const
 {
     if ( str == "" )
@@ -366,7 +274,7 @@ size_t SuffixArray::find_match(const string& str) const
         return 0xFFFFFFFFFFFFFFFF;
     }
     
-    size_t Left(0), Right(length-1);
+    size_t Left(0), Right(length - 1);
     
     while ( Left != Right )
     {
@@ -384,48 +292,34 @@ size_t SuffixArray::find_match(const string& str) const
     
     if (strCmp(str, Left) == 0)
     {
-        return sa[Left];
+        return Left;
     }
     
     return 0xFFFFFFFFFFFFFFFF;
 }
 
 
-/**
- * Find a string 'str' in the indexed sequence using suffix array 'sa[]'
- */
-// size_t SuffixArray::find_match(const string& str) const
+// /*
+//  * Given a word of size length found at index i in sa[], return a 
+//  *   list of index where the word was also found in the suffixes 
+//  *   of the indexed text
+//  */
+// vector<size_t> SuffixArray::get_all_positions(size_t i, size_t l) const
 // {
-//     if ( str == "" || length == 0)
-//     {
-//         return 0xFFFFFFFFFFFFFFFF;
-//     }
+//     vector<size_t> pos;
 //     
-//     size_t position = binary_search(str, 0, length-1);
+//     // recherche amont de i
+//     cerr << "         recherche en amont...\n";
+//     size_t k = 1;
+//     while ( i+k < length && get_lcp(i+k) >= l )
+//         pos.push_back(sa[i+k]);
 //     
-//     if (position == 0xFFFFFFFFFFFFFFFF)
-//     {
-//         return position;
-//     }
-//     return sa[position];
-// }
-
-
-// size_t SuffixArray::FindMatch(const string& str) const
-// {
-//     if ( str == "" )
-//     {
-//         cerr << "WARN: search of an empty string!\n";
-//         return 0xFFFFFFFFFFFFFFFF;
-//     }
+//     // recherche aval de i
+//     cerr << "         recherche en aval...\n";
+//     k = 0;
+//     while ( i-k >= 0 && get_lcp(i-k) >= l )
+//         pos.push_back(sa[i-k-1]);
 //     
-//     size_t index = binary_search(str, 0, length-1);
-//     
-//     if (index == 0xFFFFFFFFFFFFFFFF)
-//     {
-//         return index;
-//     }
-//     
-//     return sa[index];
+//     return pos;
 // }
 

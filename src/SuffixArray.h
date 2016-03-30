@@ -8,6 +8,7 @@
 #include <assert.h>
 #include "GenericSeq.h"
 
+
 class SuffixArray {
 
 private:
@@ -27,12 +28,10 @@ public:
     void buildLcp();
     size_t get_lcp(size_t) const;
     size_t get_length() const;
-    bool compare(const std::string&, size_t, size_t) const;
     short int strCmp(const std::string&, size_t) const;
-    size_t compute_lcp(const std::string&, size_t) const;
-    size_t binary_search(const std::string&, size_t, size_t) const;
+    size_t compute_lcp(size_t, size_t) const;
     size_t find_match(const std::string&) const;
-    size_t FindMatch(const std::string&) const;
+    std::vector<size_t> get_all_positions(size_t, size_t) const;
 };
 
 struct SaComp;

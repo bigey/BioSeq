@@ -10,7 +10,7 @@ int main(int argc, char** argv)
     char base[] = {'A','C','G','T'};
     size_t simulation = 100;            // number of simulations
     size_t seqLength = 1000;      // average sequence length
-    size_t kmer_size = 21;            // kmer size
+    size_t kmer_size = 20;            // kmer size
     
     cout << "Begining test...\n";
     size_t total = 0;
@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     for (size_t i = 0; i < simulation; i++)
     {    
         string seq("");
-        size_t length = rand() % seqLength/2 + seqLength;
+        size_t length = rand() % seqLength/4 + seqLength;
         total += length;
         
         cout << "[Test: " << i+1 << "] \n";
@@ -46,6 +46,7 @@ int main(int argc, char** argv)
         
         /* Computing suffix array and LCP array */
         cout << "Computing suffix array and LCP array...\n";
+        
         start_step = clock();
         SuffixArray sa(gs);
         end = clock();
@@ -54,6 +55,7 @@ int main(int argc, char** argv)
         cout << "   done in " << cpu_time_used << " sec";
         cout << " -> ok\n";
         
+        //return 0;
         
         /* Testing */
         cout << "Validating suffix array...\n";
@@ -119,7 +121,7 @@ int main(int argc, char** argv)
         cout << "   query take at position " << begin << endl;
         
         start_step = clock();
-        size_t match_found = sa.find_match(query);
+        size_t match_found = sa[ sa.find_match(query)] ;
         cpu_time_used = ((double) (clock() - start_step)) / CLOCKS_PER_SEC;
         
         if (match_found == 0xFFFFFFFFFFFFFFFF)
