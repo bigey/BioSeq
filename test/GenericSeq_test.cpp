@@ -16,8 +16,8 @@ int main(int argc, char** argv)
     
     char base[] = {'A','C','G','T'};
     size_t total = 0;
-    size_t mean_length = 100;
-    size_t sim = 50;
+    size_t mean_length = 10000;
+    size_t sim = 1000;
     
     for (size_t i = 0; i < sim; i++)
     {    
@@ -62,9 +62,16 @@ int main(int argc, char** argv)
         }
         cout << " -> test ok\n";
         
-        /* insertion operator */
+        /* insertion operator << */
         cout << "testing operator<<() to stdout..." << endl;
-        cout << gs;
+        cout << gs << endl;
+        cout << " -> test ok\n";
+        
+        /* revcom() function */
+        cout << "testing revcom()...\n";
+        GenericSeq rev_gs = gs.revcom();
+        //cout << rev_gs << endl;
+        assert( gs.get_seq() == rev_gs.revcom().get_seq() );
         cout << " -> test ok\n";
         
         /* one base modification */

@@ -376,7 +376,9 @@ GenericSeq GenericSeq::revcom() const
 
     /* Dyn. allocation of table char tab[] */
     newSeq.tab = new unsigned char[alloc_size(length)];
-
+    for (size_t i = 0; i < alloc_size(length); i++)
+        newSeq.tab[i] = 0;
+        
     /* Reversing sequence loop */
     for(size_t i = 0; i < length; i++)
     {
@@ -386,7 +388,7 @@ GenericSeq GenericSeq::revcom() const
         short right_shift = get_bit_index(i);
         short left_shift = get_bit_index(length -i -1);
         unsigned char tmp = 0;
-
+        
         /* Using '~' for complementing 'tab' */
         tmp = ~tab[index] >> right_shift;      // inverse and right shift
         tmp &= '\03';                          // apply 0b00000011 mask
