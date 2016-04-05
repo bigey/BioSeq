@@ -20,21 +20,17 @@ private:
     std::vector<std::streampos> begin;
     std::vector<std::string> identifier;
     size_t pointer;
-    
+
     /* States of the automata */
     enum state_t { start, fastaSeq, fastqSeq, fastqQual, stop } state;
-    
+
     /* Regex declaration */
     regex_t notDna, notQual;
     regmatch_t matches[MAX_MATCHES];
-    
-    /* Private function returning a GenericSeq object */
-    //GenericSeq gs(std::string, std::string, std::string&);
-    
+
 public:
     SeqIO(const std::string &, const char);
     virtual ~SeqIO();
-    //GenericSeq& operator=(GenericSeq &gs);
     void index();
     bool read(GenericSeq&);
     bool is_eof() const;

@@ -99,7 +99,7 @@ GenericSeq::GenericSeq(): id(""), description(""), length(0), tab(NULL) {}
  * Constructor using string sequence as input
  */
 GenericSeq::GenericSeq(const string& seq_id, const string& desc, const string& seq): id(seq_id), description(desc), length(seq.size()), tab(NULL)
-{   
+{
     /* Dynamic table allocation */
     size_t size = alloc_size(length);
     tab = new unsigned char[size];
@@ -111,10 +111,10 @@ GenericSeq::GenericSeq(const string& seq_id, const string& desc, const string& s
             cerr << "WARN: invalid character '" << seq[i]
                  << "' found at position " << i+1
                  << ". Will be converted to 'A'" << endl;
-        
+
         if ( i % 4 == 0)
             tab[get_table_index(i)] = 0;
-             
+
         tab[get_table_index(i)] |= encoding(seq[i]) << get_bit_index(i);
     }
 }
@@ -138,12 +138,12 @@ GenericSeq::GenericSeq(size_t l): id(""), description(""), length(l), tab(NULL)
 GenericSeq::GenericSeq(GenericSeq const& gs): id(gs.id), description(gs.description), length(gs.length), tab(NULL)
 {
     //throw "Non utilisé pour le moment!";
-    
+
     if(length)
     {
         size_t size = alloc_size(length);
         tab = new unsigned char[size];
-    
+
         for(size_t i = 0; i < size; i++)
             tab[i] = gs.tab[i];
     }
@@ -158,7 +158,7 @@ GenericSeq& GenericSeq::operator=(GenericSeq const& gs)
     if(this != &gs)
     {
         size_t size = alloc_size(gs.length);
-        
+
         if (length != gs.length)
         {
             if (length)
@@ -167,17 +167,17 @@ GenericSeq& GenericSeq::operator=(GenericSeq const& gs)
                 tab = NULL;
             }
             length = gs.length;
-            
+
             if (length)
                 tab = new unsigned char[size];
         }
-        
+
         if (length)
         {
             for(size_t i = 0; i < size; i++)
                 tab[i] = gs.tab[i];
         }
-        
+
         id = gs.id;
         description = gs.description;
     }
@@ -236,19 +236,19 @@ string GenericSeq::get_seq() const
 {
     unsigned char octet = 0, tmp;
     string sequence(length, 'X');
-    
+
     for(size_t i = 0; i < length; i++)
     {
         if ( (i % 4) == 0 )
             octet = tab[get_table_index(i)]; // get a new byte
 
-        
+
         tmp = octet & ((1 << 7) | (1 << 6)); // apply 0b11000000 mask
         tmp = tmp >> 6;                      // right shift the result
-        sequence[i] = decoding(tmp);           // decode and concatenate
+        sequence[i] = decoding(tmp);         // decode and concatenate
         octet = octet << 2;                  // left shift 'octet' and continue
     }
-    
+
     return sequence;
 }
 
@@ -257,12 +257,12 @@ void GenericSeq::print() const
 {
     /* Setup the nb of chars per line */
     size_t step = 80;
-    
+
     cout << ">" << get_id();
-    
+
     if(get_description() != "")
         cout << " " << get_description();
-    
+
     cout << " (length:" << get_length() << ")" << endl;
 
     string seq = get_seq();
@@ -277,7 +277,7 @@ char GenericSeq::get_symbol_at(size_t pos) const
         cerr << "WARN: position " << pos
              << " is greater than sequence's length "
              << length << endl;
-             
+
         assert(false);
 
     } else {
@@ -298,13 +298,13 @@ string GenericSeq::get_sub_seq(size_t start, size_t end) const
 {
     if ( start < 0 || end >= length || start >= end )
     {
-        cerr << "WARN: position should be 0 <= pos <= " 
+        cerr << "WARN: position should be 0 <= pos <= "
              << length - 1 << endl;
-             
+
         return string("");
     }
     string seq(end - start + 1, 'X');
-        
+
     for (size_t i = start; i <= end; i++)
         seq[i - start] = get_symbol_at(i);
 
@@ -316,29 +316,29 @@ void GenericSeq::set_symbol_at(size_t p, char c)
 {
     if ( p >= length ) {
         cerr << "WARN: position " << p
-             << " should be less than or equal to ( <= ) " 
+             << " should be less than or equal to ( <= ) "
              << length - 1 << endl;
-             
+
         assert(false);
-             
+
     } else if ( !is_valid(c) ) {
-        cerr << "WARN: invalid character '" << c 
+        cerr << "WARN: invalid character '" << c
              << "'. Will be converted to 'A'" << endl;
 
     } else {
-        
+
         size_t indice = get_table_index(p);
         size_t shift  = get_bit_index(p);
         unsigned char &byte = tab[indice];
-        
+
         /*
          *   This code was kindly provided by Alban Mancheron,
          *   Montpellier Univiersity, France
          */
-        
+
         byte &= ~(3 << shift);
         byte |= encoding(c) << shift;
-        
+
         /* This code was no more needed
 
         if ( c == 'a' || c == 'A' )
@@ -354,14 +354,14 @@ void GenericSeq::set_symbol_at(size_t p, char c)
             byte &= ~(1 << (shift + 1));
             byte |= (1 << shift);
         }
-        else 
+        else
         {
             byte |=  (1 << (shift + 1));
             byte &= ~(1 << shift);
         }
-        
+
         tab[indice] = byte;
-        
+
         */
     }
 }
@@ -378,7 +378,7 @@ GenericSeq GenericSeq::revcom() const
     newSeq.tab = new unsigned char[alloc_size(length)];
     for (size_t i = 0; i < alloc_size(length); i++)
         newSeq.tab[i] = 0;
-        
+
     /* Reversing sequence loop */
     for(size_t i = 0; i < length; i++)
     {
@@ -388,11 +388,11 @@ GenericSeq GenericSeq::revcom() const
         short right_shift = get_bit_index(i);
         short left_shift = get_bit_index(length -i -1);
         unsigned char tmp = 0;
-        
+
         /* Using '~' for complementing 'tab' */
         tmp = ~tab[index] >> right_shift;      // inverse and right shift
         tmp &= '\03';                          // apply 0b00000011 mask
-        tmp = tmp << left_shift;               
+        tmp = tmp << left_shift;
         newSeq.tab[new_index] |= tmp;
     }
     return newSeq;
@@ -408,32 +408,32 @@ void GenericSeq::read(ifstream &is)
         cerr << "unable to read from stream!" << endl;
         return;
     }
-    
+
     if (length) {
         length = 0;
         delete[] tab;
         tab = NULL;
     }
-    
+
     streampos p = is.tellg();
     char c;
-    
+
     while ( ! is.eof() && is_valid(c = is.get()) )
         length += !isspace(c);
-    
+
     cerr << "reading " << length << " characters...\n";
-    
+
     if (length)
     {
         tab = new unsigned char[alloc_size(length)];
         size_t  i = 0;
         is.seekg(p);
-                
+
         while ( !is.eof() && is_valid(c = is.get()) )
             if (!isspace(c))
                 set_symbol_at(i++, c);
     }
-    
+
     return;
 }
 
@@ -450,9 +450,9 @@ void GenericSeq::write(ostream &os) const
 
 
 /*============================================================================
- * 
+ *
  *                          Non member methods
- * 
+ *
  ============================================================================*/
 
 /**
@@ -473,5 +473,3 @@ ifstream& operator>>(ifstream& ifs, GenericSeq& gs)
     gs.read(ifs);
     return ifs;
 }
-
-

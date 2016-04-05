@@ -8,6 +8,7 @@
 #include <assert.h>
 #include "GenericSeq.h"
 
+#define MAX 0xFFFFFFFFFFFFFFFF
 
 class SuffixArray {
 
@@ -16,7 +17,7 @@ private:
     const GenericSeq gs;
     size_t* sa;
     size_t* lcp;
-    
+
 public:
     SuffixArray();
     SuffixArray(const GenericSeq&);
@@ -26,6 +27,7 @@ public:
     size_t operator[] (size_t) const;
     void buildSa();
     void buildLcp();
+    std::string get_id() const;
     size_t get_lcp(size_t) const;
     size_t get_length() const;
     short int strCmp(const std::string&, size_t) const;
