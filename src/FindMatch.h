@@ -23,6 +23,7 @@ class FindMatch {
 
 private:
     std::vector<match_t> match;       // kmer for and rev matching pos.
+    std::vector<size_t> k_pos_f, k_pos_r;  // best matching positions
     size_t Lk;                        // kmer length
     GenericSeq R;                     // read object (GenericSeq)
     size_t Lr;                        // read length
@@ -32,7 +33,8 @@ private:
     std::string Gname;                // reference id (name)
     size_t match_begin;               // match begin position
     size_t match_end;                 // match end position
-    std::string strand;               // read strand
+    short int strand;                 // read strand {-1,+1}
+    std::string cigar;
 
     /* private methods */
     void kmer_search(size_t, size_t, std::vector<size_t>&) const;
@@ -42,12 +44,11 @@ public:
     FindMatch();
     FindMatch(const GenericSeq&, const SuffixArray&, const size_t);
     virtual ~FindMatch();
-    // size_t locate_read();
     size_t locate_read(std::vector< std::vector<size_t> >&,
         std::vector<size_t>&);
     void output() const;
     size_t best_path();
-    void analyze() const;
+    void analyze();
 
 };
 

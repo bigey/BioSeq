@@ -71,37 +71,18 @@ int main(int argc, char** argv)
             continue;
         }
 
-        /* Construction of FindMatch object */
-        cerr << "   Constructing FindMatch object..." << endl;
+        /* Use FindMatch class to locate read on reference */
+        cerr << "   Try to locate read..." << endl;
         start = clock();
         FindMatch fm(gs_read, sa, kmer_size);
+        fm.output();
+        fm.analyze();
+        
         cpu_time = ((double) (clock() - start)) / CLOCKS_PER_SEC;
         cerr << "      done in " << cpu_time << " sec -> ok\n";
 
-
-        // /* Search for kmer using Suffix Array */
-        // cerr << "   Searching matching kmer..." << endl;
-        // start = clock();
-        // fm.find_matches();
-        // cpu_time = ((double) (clock() - start)) / CLOCKS_PER_SEC;
-        // cerr << "      done in " << cpu_time << " sec -> ok\n";
-        //
-        // /* Search best path between read kmer */
-        // cerr << "   Compute best kmer path...\n";
-        // start = clock();
-        // fm.best_path();
-        // cpu_time = ((double) (clock() - start)) / CLOCKS_PER_SEC;
-        // cerr << "      done in " << cpu_time << " sec -> ok\n";
-        //
-        // /* Analyse mapping */
-        // cerr << "   Analyzing mapping..." << endl;
-        // start = clock();
-        // fm.analyze();
-        // cpu_time = ((double) (clock() - start)) / CLOCKS_PER_SEC;
-        // cerr << "      done in " << cpu_time << " sec -> ok\n";
-        //
-        // /* Next read now */
-        // cerr << "[Read: " << i << "] processed\n\n";
+        /* Next read now */
+        cerr << "[Read: " << i << "] processed\n\n";
 
         i++;
     }

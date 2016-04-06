@@ -163,9 +163,10 @@ size_t SuffixArray::operator[] (size_t i) const
 void SuffixArray::buildSa()
 {
     if ( length == 0 )
+    {
         cerr << "ERROR: indexing a sequence of length 0!\n";
-
-    assert(length != 0);
+        throw;
+    }
 
     clock_t start = clock();
     double cpu_time;
