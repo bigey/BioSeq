@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -O0 -Wall -ansi -pedantic -DDEBUG -g
+CXXFLAGS = -O4 -Wall -ansi -pedantic -DDEBUG -g
 SHELL = /bin/sh
 
 PREFIX := $(pwd)
