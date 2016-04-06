@@ -1,9 +1,9 @@
 // #include <assert.h>
 // #include <string>  // std::string, std::stoi
-#include "../src/GenericSeq.h"
-#include "../src/SuffixArray.h"
-#include "../src/SeqIO_b.h"
-#include "../src/FindMatch.h"
+#include "GenericSeq.h"
+#include "SuffixArray.h"
+#include "SeqIO_b.h"
+#include "FindMatch.h"
 
 using namespace std;
 

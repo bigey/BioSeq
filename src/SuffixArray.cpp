@@ -176,7 +176,7 @@ void SuffixArray::buildSa()
 
     cerr << "      sorting...\n";
     sort(sa, sa + length, SaComp(gs));
-
+    // sort(sa, sa + length, f());
 
     cpu_time = ((double) (clock() - start)) / CLOCKS_PER_SEC;
     cerr << "   SA builded in " << cpu_time << " sec\n";

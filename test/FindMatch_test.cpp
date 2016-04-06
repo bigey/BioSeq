@@ -61,7 +61,8 @@ int main(int argc, char** argv)
         char strand = '+';
         size_t begin = rand() % (length - read_size +1);
         string read_seq = seq.substr(begin, read_size);
-        GenericSeq read("@id","test read info", read_seq);
+        string id = "@id";
+        GenericSeq read(id ,"test read info", read_seq);
 
         if ( rand() % 2 )
         {
@@ -78,6 +79,9 @@ int main(int argc, char** argv)
         cout << "   Constructing FindMatch object..." << endl;
         start = clock();
         FindMatch fm(read, sa, kmer_size);
+        fm.output();
+        fm.analyze();
+        
         cpu_time = ((double) (clock() - start)) / CLOCKS_PER_SEC;
         cout << "      done in " << cpu_time << " sec";
         cout << " -> ok\n";

@@ -34,7 +34,8 @@ private:
     size_t match_begin;               // match begin position
     size_t match_end;                 // match end position
     short int strand;                 // read strand {-1,+1}
-    std::string cigar;
+    std::string cigar;                // variation string
+    size_t nb_of_kmer;                // nb of possible k-mer on the read
 
     /* private methods */
     void kmer_search(size_t, size_t, std::vector<size_t>&) const;

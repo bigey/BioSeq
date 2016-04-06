@@ -34,8 +34,10 @@ public:
     size_t compute_lcp(size_t, size_t) const;
     size_t find_match(const std::string&) const;
     std::vector<size_t> get_all_positions(size_t, size_t) const;
+
+    bool f(size_t, size_t ) const;
 };
 
-struct SaComp;
+// struct SaComp;
 
 #endif /* SUFFIXARRAY_H_ */

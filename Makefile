@@ -2,14 +2,15 @@ CXX = g++
 CXXFLAGS = -O0 -Wall -ansi -pedantic -DDEBUG -g
 SHELL = /bin/sh
 
+PREFIX := $(pwd)
 SRC = src
 LIB = lib
 TEST = test
-BIN = bin
+BIN = $(CURDIR)/bin
 
 export CXX CXXFLAGS SHELL SRC LIB TEST BIN
 
-.PHONY: all test clean
+.PHONY: all test install clean
 
 
 all:
@@ -18,6 +19,11 @@ all:
 
 test: all
 	@cd $(TEST) && $(MAKE)
+
+install: all
+	@echo "install to " $(BIN)
+	@mkdir -p $(BIN)
+	@cd $(SRC) && $(MAKE) install
 
 clean:
 	@echo "Cleaning..."

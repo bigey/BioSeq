@@ -16,31 +16,31 @@ FindMatch::FindMatch(const GenericSeq& read, const SuffixArray& sa, const size_t
     Lk(k_size), R(read), Lr(read.get_length()), SA(sa), Lg(sa.get_length()),
     strand(0), cigar("")
 {
-    /* comment... */
+    /* If read length is longer than k-mer length */
     if (Lr-Lk+1 > 0)
     {
+        nb_of_kmer = Lr-Lk+1;
         Rname = R.get_id();
         Gname = sa.get_id();
 
-        match.reserve(Lr-Lk+1);
+        match.reserve(nb_of_kmer);
         make_kmer();
 
         vector< vector<size_t> > k_match_f, k_match_r;
-        // vector<size_t> k_pos_f, k_pos_r;
         size_t nb_kmer_located_f(0), nb_kmer_located_r(0);
 
-        // cerr << "nb of k-mer expected:" << Lr-Lk+1 << endl;
+        // cerr << "nb of k-mer expected:" << nb_of_kmer << endl;
 
 
         /* Try to locate on forward strand */
         cerr << "\nforward strand\n";
-        for (size_t i = 0; i < Lr-Lk+1; i++) {
+        for (size_t i = 0; i < nb_of_kmer; i++) {
             k_match_f.push_back(match[i].pos_f);
         }
 
         nb_kmer_located_f = locate_read(k_match_f, k_pos_f);
 
-        // for (size_t i = 0; i < Lr-Lk+1; i++)
+        // for (size_t i = 0; i < nb_of_kmer; i++)
         // {
         //     if(k_pos_f[i] == NONE)
         //     {
@@ -60,13 +60,13 @@ FindMatch::FindMatch(const GenericSeq& read, const SuffixArray& sa, const size_t
 
         /* Try to locate on reverse strand */
         cerr << "\nreverse strand\n";
-        for (size_t i = 0; i < Lr-Lk+1; i++) {
+        for (size_t i = 0; i < nb_of_kmer; i++) {
             k_match_r.push_back(match[i].pos_r);
         }
 
         nb_kmer_located_r = locate_read(k_match_r, k_pos_r);
 
-        // for (size_t i = 0; i < Lr-Lk+1; i++)
+        // for (size_t i = 0; i < nb_of_kmer; i++)
         // {
         //     if (k_pos_r[i] == NONE) {
         //         cerr << ".";
@@ -82,13 +82,13 @@ FindMatch::FindMatch(const GenericSeq& read, const SuffixArray& sa, const size_t
         //     cerr << "\n" << nb_kmer_located_r
         //          << " k-mer localized\n";
 
-
+        /* If nb of matches on forward strand greater */
         if (nb_kmer_located_f > nb_kmer_located_r)
         {
             strand = +1;
 
             size_t i = 0;
-            while (i < Lr-Lk+1 && k_pos_f[i] == NONE) { i++; }
+            while (i < nb_of_kmer && k_pos_f[i] == NONE) { i++; }
             match_begin = k_pos_f[i];
 
             i = Lr-Lk;
@@ -100,7 +100,7 @@ FindMatch::FindMatch(const GenericSeq& read, const SuffixArray& sa, const size_t
             strand = -1;
 
             size_t i = 0;
-            while (i < Lr-Lk+1 && k_pos_r[i] == NONE) { i++; }
+            while (i < nb_of_kmer && k_pos_r[i] == NONE) { i++; }
             match_begin = k_pos_r[i];
 
             i = Lr-Lk;
@@ -164,11 +164,8 @@ void FindMatch::make_kmer()
 
     /*
      * Generate k-mer from the read sequence
-     *   nb of Kmer = Lr-Lk+1, where:
-     *     Lr is read length
-     *     Lk is kmer length
      */
-    for (size_t i = 0; i < Lr-Lk+1; i++)
+    for (size_t i = 0; i < nb_of_kmer; i++)
     {
         match_t k_match;  // structure of two vector<size_t>
 
@@ -206,8 +203,8 @@ size_t FindMatch::locate_read(vector< vector<size_t> >& k_match,
     long int gap_observ;
     size_t counter(0);
 
-    /* Fill the k-mer vector */
-    for (size_t i = 0; i < Lr-Lk+1; i++)
+    /* Fill the k-mer vector with NONE */
+    for (size_t i = 0; i < nb_of_kmer; i++)
         k_pos.push_back(NONE);
 
 
@@ -256,7 +253,7 @@ size_t FindMatch::locate_read(vector< vector<size_t> >& k_match,
         }
     }
 
-    for (size_t i = 0; i < Lr-Lk+1; i++)
+    for (size_t i = 0; i < nb_of_kmer; i++)
     {
         if (k_pos[i] != NONE) {
             counter++;
@@ -268,7 +265,7 @@ size_t FindMatch::locate_read(vector< vector<size_t> >& k_match,
 
 
 /**
- * Determine read location
+ * Output to STDOUT
  */
 void FindMatch::output() const
 {
@@ -299,11 +296,11 @@ void FindMatch::output() const
 
 
 /**
- * Compute variation type
+ * Try to impute variation type
  */
 void FindMatch::analyze()
 {
-    vector<size_t> rd, rf;
+    vector<size_t> pos;
 
     if (strand == 0)
     {
@@ -311,88 +308,167 @@ void FindMatch::analyze()
     }
     else if (strand == 1)
     {
-        for (size_t i = 0; i < Lr-Lk+1; i++) {
-            rd.push_back(i);
-            rf.push_back(k_pos_f[i]);
+        for (size_t i = 0; i < nb_of_kmer; i++) {
+            pos.push_back(k_pos_f[i]);
         }
     }
     else
     {
-        for (size_t i = 0; i < Lr-Lk+1; i++) {
-            rd.push_back(i);
-            rf.push_back(k_pos_r[i]);
+        for (size_t i = 0; i < nb_of_kmer; i++) {
+            pos.push_back(k_pos_r[i]);
         }
     }
 
-    size_t x_p = rd[0];
-    size_t y_p = rf[0];
+    size_t x_p(NONE);
+    size_t y_p(NONE);
+    size_t i(0);
 
-    for (size_t i = 1; i < rd.size(); i++)
-    {
-        size_t x_n = rd[i];
-        size_t y_n = rf[i];
+    while (i < nb_of_kmer ) {
 
-        long int dx  = x_n - x_p;
-        long int dy  = y_n - y_p;
-        long int dxdy = dx - dy;
-
-        cerr << x_n << "-" << x_p << "=dx=" << dx << " "
-             << y_n << "-" << y_p << "=dy=" << dy
-             << " dx-dy:" << dxdy << endl;
-
-        // Perfect Match
-        if ( dx == 1 && dy == 1 )
-        {
-            cigar += "M";
-            //cout << "M";
+        if (pos[i] == NONE) {
+            i++;
+            continue;
         }
 
-        // Substitution
-        else if ( dx - Lk > 1 && dy - Lk > 1 && dx - dy == 0 )
+        size_t x_n = i;
+        size_t y_n = pos[i];
+
+        if (x_p != NONE || y_p != NONE)
         {
-            long int Lsub = dx - Lk - 1;
-            // assert (Lsub >= 0);
-            // cigar += string(Lsub, 'S');
-             cigar += string("S");
+            long int dx  = x_n - x_p;
+            long int dy  = y_n - y_p;
+            long int dxdy = dx - dy;
+
+            cerr << x_n << "-" << x_p << "=dx=" << dx << " "
+                 << y_n << "-" << y_p << "=dy=" << dy
+                 << " dx-dy:" << dxdy << endl;
+
+            // Perfect Match
+            if ( dx == 1 && dy == 1 )
+            {
+             cigar += "M";
+             //cout << "M";
+            }
+
+            // Substitution
+            else if ( dx - (long int) Lk > 1 && dy - (long int) Lk > 1 && dx - dy == 0 )
+            {
+                long int Lsub = dx - (long int) Lk - 1;
+                assert (Lsub >= 0);
+                cigar += string(Lsub, 'S');
+                // cigar += string("S");
+            }
+
+            // Insertion
+            else if ( dx - (long int) Lk > 0 && dy - (long int) Lk == 0 )
+            {
+                long int Lins = dx - (long int) Lk;
+                assert (Lins >= 0);
+                cigar += string(Lins, 'I');
+                // cigar += string("I");
+            }
+
+            // Deletion
+            else if ( dx - (long int) Lk == 0 && dy - (long int) Lk > 0 )
+            {
+                long int Ldel = dy - (long int) Lk;
+                cerr  << Ldel << " " << dy - (long int) Lk << endl;
+                assert (Ldel >= 0);
+                cigar += string(Ldel, 'D');
+                // cigar += string("D");
+            }
+
+            // Complex
+            else
+            {
+                cigar += "X";
+            }
         }
 
-        // Insertion
-        else if ( dx - Lk > 0 && dy - Lk == 0 )
-        {
-            long int Lins = dx - Lk;
-            // assert (Lins >= 0);
-            // cigar += string(Lins, 'I');
-             cigar += string("I");
-        }
-
-        // Deletion
-        else if ( dx - Lk == 0 && dy - Lk > 0 )
-        {
-            long int Ldel = dy - Lk;
-            // assert (Ldel >= 0);
-            // cigar += string(Ldel, 'D');
-            cigar += string("D");
-        }
-
-        // Complex: Substitution + Indel
-        if ( dx > dx )
-        {
-            long int Lsub = dy - Lk - 1;
-            long int Lins = dxdy;
-            // assert (Lsub+Lins >= 0);
-            // cigar += string(Lsub + Lins, 'X');
-            cigar += string("X");
-        }
-        else if ( dx < dy )
-        {
-            long int Lsub = dx - Lk - 1;
-            long int Ldel = - dxdy;
-            // assert (Lsub+Ldel >= 0);
-            // cigar += string(Lsub + Ldel, 'Y');
-            cigar += string("Y");
-        }
+        // cerr << "cigar:" << cigar << endl;
+        // if (p_char != c)
+        // {
+        //     cigar += string(count) + c;
+        //     p_char = c;
+        //     count = 0;
+        // }
 
         x_p = x_n;
         y_p = y_n;
+        i++;
     }
+
+    return;
+
+    // size_t x_p = rd[0];
+    // size_t y_p = rf[0];
+    //
+    // for (size_t i = 1; i < rd.size(); i++)
+    // {
+    //     size_t x_n = rd[i];
+    //     size_t y_n = rf[i];
+    //
+    //     long int dx  = x_n - x_p;
+    //     long int dy  = y_n - y_p;
+    //     long int dxdy = dx - dy;
+    //
+    //     cerr << x_n << "-" << x_p << "=dx=" << dx << " "
+    //          << y_n << "-" << y_p << "=dy=" << dy
+    //          << " dx-dy:" << dxdy << endl;
+    //
+    //     // Perfect Match
+    //     if ( dx == 1 && dy == 1 )
+    //     {
+    //         cigar += "M";
+    //         //cout << "M";
+    //     }
+    //
+    //     // Substitution
+    //     else if ( dx - Lk > 1 && dy - Lk > 1 && dx - dy == 0 )
+    //     {
+    //         long int Lsub = dx - Lk - 1;
+    //         // assert (Lsub >= 0);
+    //         // cigar += string(Lsub, 'S');
+    //          cigar += string("S");
+    //     }
+    //
+    //     // Insertion
+    //     else if ( dx - Lk > 0 && dy - Lk == 0 )
+    //     {
+    //         long int Lins = dx - Lk;
+    //         // assert (Lins >= 0);
+    //         // cigar += string(Lins, 'I');
+    //          cigar += string("I");
+    //     }
+    //
+    //     // Deletion
+    //     else if ( dx - Lk == 0 && dy - Lk > 0 )
+    //     {
+    //         long int Ldel = dy - Lk;
+    //         // assert (Ldel >= 0);
+    //         // cigar += string(Ldel, 'D');
+    //         cigar += string("D");
+    //     }
+    //
+    //     // Complex: Substitution + Indel
+    //     if ( dx > dx )
+    //     {
+    //         long int Lsub = dy - Lk - 1;
+    //         long int Lins = dxdy;
+    //         // assert (Lsub+Lins >= 0);
+    //         // cigar += string(Lsub + Lins, 'X');
+    //         cigar += string("X");
+    //     }
+    //     else if ( dx < dy )
+    //     {
+    //         long int Lsub = dx - Lk - 1;
+    //         long int Ldel = - dxdy;
+    //         // assert (Lsub+Ldel >= 0);
+    //         // cigar += string(Lsub + Ldel, 'Y');
+    //         cigar += string("Y");
+    //     }
+    //
+    //     x_p = x_n;
+    //     y_p = y_n;
+    // }
 }
