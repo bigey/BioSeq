@@ -33,6 +33,7 @@ FindMatch::FindMatch(const GenericSeq& read, const SuffixArray& sa, const size_t
 
 
         /* Try to locate on forward strand */
+        
         // cerr << "\nforward strand\n";
         for (size_t i = 0; i < nb_of_kmer; i++) {
             k_match_f.push_back(match[i].pos_f);
@@ -59,6 +60,7 @@ FindMatch::FindMatch(const GenericSeq& read, const SuffixArray& sa, const size_t
 
 
         /* Try to locate on reverse strand */
+        
         // cerr << "\nreverse strand\n";
         for (size_t i = 0; i < nb_of_kmer; i++) {
             k_match_r.push_back(match[i].pos_r);
@@ -82,7 +84,7 @@ FindMatch::FindMatch(const GenericSeq& read, const SuffixArray& sa, const size_t
         //     cerr << "\n" << nb_kmer_located_r
         //          << " k-mer localized\n";
 
-        /* If nb of matches on forward strand greater */
+        /* If nb of matches on forward strand greater than reverses */
         if (nb_kmer_located_f > nb_kmer_located_r)
         {
             strand = +1;
@@ -219,6 +221,7 @@ size_t FindMatch::locate_read(vector< vector<size_t> >& k_match,
             size_t end   = Lr-Lk-l;
             gap_comput = end-begin-Lk;
 
+			/* If both positions are confirmed */
             if (k_pos[begin] != NONE && k_pos[end] != NONE)
                 continue;
 
@@ -244,6 +247,7 @@ size_t FindMatch::locate_read(vector< vector<size_t> >& k_match,
                             //      << match[end].pos_f[j] << ")\n";
 
                             /* Store positions */
+                            
                             k_pos[begin] = k_match[begin].at(i);
                             k_pos[end]   = k_match[end].at(j);
                         }
@@ -323,8 +327,9 @@ void FindMatch::analyze()
     size_t y_p(NONE);
     size_t i(0);
 
-    while (i < nb_of_kmer ) {
-
+    while (i < nb_of_kmer )
+    {
+    	/* Search for first valid k-mer position */
         if (pos[i] == NONE) {
             i++;
             continue;
@@ -340,6 +345,7 @@ void FindMatch::analyze()
 
             // long int dxdy = dx - dy;
 
+			/* Decomment to debug */
             // cerr << x_n << "-" << x_p << "=dx=" << dx << " "
             //      << y_n << "-" << y_p << "=dy=" << dy
             //      << " dx-dy:" << dxdy << endl;
@@ -348,7 +354,6 @@ void FindMatch::analyze()
             if ( dx == 1 && dy == 1 )
             {
              cigar += "M";
-             //cout << "M";
             }
 
             // Substitution
@@ -357,7 +362,6 @@ void FindMatch::analyze()
                 long int Lsub = dx - (long int) Lk - 1;
                 assert (Lsub >= 0);
                 cigar += string(Lsub, 'S');
-                // cigar += string("S");
             }
 
             // Insertion
@@ -366,7 +370,6 @@ void FindMatch::analyze()
                 long int Lins = dx - (long int) Lk;
                 assert (Lins >= 0);
                 cigar += string(Lins, 'I');
-                // cigar += string("I");
             }
 
             // Deletion
@@ -376,10 +379,9 @@ void FindMatch::analyze()
                 cerr  << Ldel << " " << dy - (long int) Lk << endl;
                 assert (Ldel >= 0);
                 cigar += string(Ldel, 'D');
-                // cigar += string("D");
             }
 
-            // Complex
+            // Complex variation: not yet implemented
             else
             {
                 cigar += "X";
@@ -387,12 +389,6 @@ void FindMatch::analyze()
         }
 
         // cerr << "cigar:" << cigar << endl;
-        // if (p_char != c)
-        // {
-        //     cigar += string(count) + c;
-        //     p_char = c;
-        //     count = 0;
-        // }
 
         x_p = x_n;
         y_p = y_n;
@@ -401,3 +397,5 @@ void FindMatch::analyze()
 
     return;
 }
+
+

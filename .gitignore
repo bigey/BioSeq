@@ -1,6 +1,7 @@
 *.[ao]
 *.fasta
 *.fastq
+*~
 .directory
 data/
 

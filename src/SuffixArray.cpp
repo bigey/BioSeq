@@ -4,25 +4,19 @@ using namespace std;
 
 
 /**
- * Sequence comparison
+ * Sequence comparison structure
  */
-struct SaComp {
-
-    GenericSeq gs;
-    SaComp(const GenericSeq& s): gs(s) {}
-
-    bool operator() (size_t a, size_t b) const
+SaComp::SaComp(const GenericSeq& s): gs(s) {}
+bool SaComp::operator() (size_t a, size_t b) const
+{
+	size_t length = gs.get_length();
+    while ((a < length) && (b < length) && (gs[a] == gs[b]))
     {
-        size_t length = gs.get_length();
-
-        while ((a < length) && (b < length) && (gs[a] == gs[b]))
-        {
-            a++; b++;
-        }
-
-        return (a == length) || ((b < length) && (gs[a] < gs[b]));
+        a++; b++;
     }
-};
+
+    return (a == length) || ((b < length) && (gs[a] < gs[b]));
+}
 
 
 /**
@@ -174,9 +168,10 @@ void SuffixArray::buildSa()
     for(size_t i = 0; i < length; i++)
         sa[i] = i;
 
+	/* Sorting suffix array */
     cerr << "      sorting...\n";
     sort(sa, sa + length, SaComp(gs));
-    // sort(sa, sa + length, f());
+    
 
     cpu_time = ((double) (clock() - start)) / CLOCKS_PER_SEC;
     cerr << "   SA builded in " << cpu_time << " sec\n";
@@ -235,7 +230,7 @@ size_t SuffixArray::get_lcp(size_t s_num) const
          << ". Should be [1.." << length-1 << "]" << endl;
 
     assert(s_num <= 0 && s_num >= length);
-    return MAX;
+    return NONE;
 }
 
 
@@ -281,7 +276,7 @@ size_t SuffixArray::find_match(const string& str) const
     if ( str == "" )
     {
         cerr << "WARN: search of an empty string!\n";
-        return MAX;
+        return NONE;
     }
 
     size_t Left(0), Right(length - 1);
@@ -305,5 +300,5 @@ size_t SuffixArray::find_match(const string& str) const
         return Left;
     }
 
-    return MAX;
+    return NONE;
 }

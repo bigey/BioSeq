@@ -2,13 +2,16 @@
 #include <iomanip>
 #include "../src/SuffixArray.h"
 
+#define MAX 0xFFFFFFFFFFFFFFFF
+
 using namespace std;
+
 
 int main(int argc, char** argv)
 {
     /* Simulation parameters */
     char base[] = {'A','C','G','T'};
-    size_t simulation = 1;            // number of simulations
+    size_t simulation = 1000;            // number of simulations
     size_t seqLength = 100000;      // average sequence length
     size_t kmer_size = 21;            // kmer size
 
@@ -124,7 +127,7 @@ int main(int argc, char** argv)
         size_t match_found = sa[ sa.find_match(query)] ;
         cpu_time_used = ((double) (clock() - start_step)) / CLOCKS_PER_SEC;
 
-        if (match_found == 0xFFFFFFFFFFFFFFFF)
+        if (match_found == MAX)
         {
             cout << "   query NOT found!" << endl;
         }

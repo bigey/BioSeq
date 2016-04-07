@@ -8,7 +8,7 @@
 #include <assert.h>
 #include "GenericSeq.h"
 
-#define MAX 0xFFFFFFFFFFFFFFFF
+#define NONE 0xFFFFFFFFFFFFFFFF
 
 class SuffixArray {
 
@@ -35,9 +35,14 @@ public:
     size_t find_match(const std::string&) const;
     std::vector<size_t> get_all_positions(size_t, size_t) const;
 
-    bool f(size_t, size_t ) const;
 };
 
-// struct SaComp;
+
+struct SaComp {
+	const GenericSeq &gs;
+    SaComp(const GenericSeq&);
+    bool operator() (size_t a, size_t b) const;
+};
+
 
 #endif /* SUFFIXARRAY_H_ */

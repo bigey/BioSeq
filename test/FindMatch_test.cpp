@@ -9,10 +9,10 @@ int main(int argc, char** argv)
 {
     /* Simulation parameters */
     char base[] = {'A','C','G','T'};
-    size_t simulation = 100;            // number of simulations
-    size_t seqLength  = 10000;           // average sequence length
+    size_t simulation = 500;            // number of simulations
+    size_t seqLength  = 100000;           // average sequence length
     size_t read_size  = 100;             // read size
-    size_t kmer_size  = 11;             // kmer size
+    size_t kmer_size  = 21;             // kmer size
 
     cout << "Begining test...\n";
     size_t total = 0;
@@ -79,36 +79,9 @@ int main(int argc, char** argv)
         cout << "   Constructing FindMatch object..." << endl;
         start = clock();
         FindMatch fm(read, sa, kmer_size);
+        fm.analyze();
         fm.output();
-        fm.analyze();
         
-        cpu_time = ((double) (clock() - start)) / CLOCKS_PER_SEC;
-        cout << "      done in " << cpu_time << " sec";
-        cout << " -> ok\n";
-
-        /* Search for kmer using Suffix Array */
-        // cout << "   Searching for matching kmer..." << endl;
-        // start = clock();
-        // fm.locate_read();
-        // cpu_time = ((double) (clock() - start)) / CLOCKS_PER_SEC;
-        // cout << "      done in " << cpu_time << " sec";
-        // cout << " -> ok\n";
-
-        /* Search best path between read kmer */
-        // cout << "   Compute best kmer path...\n";
-        // start = clock();
-        //
-        // fm.find_matches();
-        // cpu_time = ((double) (clock() - start)) / CLOCKS_PER_SEC;
-        // cout << "      done in " << cpu_time << " sec";
-        // cout << " -> ok\n";
-
-        continue;
-
-        /* Analyse mapping */
-        cout << "   Analyzing mapping..." << endl;
-        start = clock();
-        fm.analyze();
         cpu_time = ((double) (clock() - start)) / CLOCKS_PER_SEC;
         cout << "      done in " << cpu_time << " sec";
         cout << " -> ok\n";
