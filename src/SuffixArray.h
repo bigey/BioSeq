@@ -19,7 +19,7 @@ private:
     size_t* lcp;
 
 public:
-    SuffixArray();
+    // SuffixArray();
     SuffixArray(const GenericSeq&);
     SuffixArray(SuffixArray const&);
     SuffixArray& operator=(SuffixArray const&);

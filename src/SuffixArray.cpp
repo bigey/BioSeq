@@ -22,7 +22,7 @@ bool SaComp::operator() (size_t a, size_t b) const
 /**
  * Default constructor
  */
-SuffixArray::SuffixArray() {}
+// SuffixArray::SuffixArray() {}
 
 
 /**
@@ -171,7 +171,7 @@ void SuffixArray::buildSa()
 	/* Sorting suffix array */
     cerr << "      sorting...\n";
     sort(sa, sa + length, SaComp(gs));
-    
+
 
     cpu_time = ((double) (clock() - start)) / CLOCKS_PER_SEC;
     cerr << "   SA builded in " << cpu_time << " sec\n";

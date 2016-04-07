@@ -25,9 +25,9 @@ private:
     std::vector<match_t> match;       // kmer for and rev matching pos.
     std::vector<size_t> k_pos_f, k_pos_r;  // best matching positions
     size_t Lk;                        // kmer length
-    const GenericSeq &R;                     // read object (GenericSeq)
+    const GenericSeq& R;              // read object (GenericSeq)
     size_t Lr;                        // read length
-    const SuffixArray &SA;                   // suffix array object (SuffixArray)
+    const SuffixArray& SA;            // suffix array object (SuffixArray)
     size_t Lg;                        // reference length
     std::string Rname;                // read id (name)
     std::string Gname;                // reference id (name)
@@ -42,7 +42,7 @@ private:
     void make_kmer();
 
 public:
-    FindMatch();
+    // FindMatch();
     FindMatch(const GenericSeq&, const SuffixArray&, const size_t);
     virtual ~FindMatch();
     size_t locate_read(std::vector< std::vector<size_t> >&,

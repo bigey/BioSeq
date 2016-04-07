@@ -2,7 +2,6 @@ CXX = g++
 CXXFLAGS = -O4 -Wall -ansi -pedantic -DDEBUG -g
 SHELL = /bin/sh
 
-PREFIX := $(pwd)
 SRC = src
 LIB = lib
 TEST = test

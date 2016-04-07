@@ -6,7 +6,7 @@ using namespace std;
 /**
  * Default constructor
  */
-FindMatch::FindMatch() {}
+// FindMatch::FindMatch() {}
 
 
 /**
@@ -33,7 +33,7 @@ FindMatch::FindMatch(const GenericSeq& read, const SuffixArray& sa, const size_t
 
 
         /* Try to locate on forward strand */
-        
+
         // cerr << "\nforward strand\n";
         for (size_t i = 0; i < nb_of_kmer; i++) {
             k_match_f.push_back(match[i].pos_f);
@@ -60,7 +60,7 @@ FindMatch::FindMatch(const GenericSeq& read, const SuffixArray& sa, const size_t
 
 
         /* Try to locate on reverse strand */
-        
+
         // cerr << "\nreverse strand\n";
         for (size_t i = 0; i < nb_of_kmer; i++) {
             k_match_r.push_back(match[i].pos_r);
@@ -247,7 +247,7 @@ size_t FindMatch::locate_read(vector< vector<size_t> >& k_match,
                             //      << match[end].pos_f[j] << ")\n";
 
                             /* Store positions */
-                            
+
                             k_pos[begin] = k_match[begin].at(i);
                             k_pos[end]   = k_match[end].at(j);
                         }
@@ -397,5 +397,3 @@ void FindMatch::analyze()
 
     return;
 }
-
-
