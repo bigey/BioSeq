@@ -14,7 +14,7 @@ class SuffixArray {
 
 private:
     size_t length;
-    const GenericSeq gs;
+    const GenericSeq &gs;
     size_t* sa;
     size_t* lcp;
 
